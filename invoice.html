@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Invoice Generator Pro</title>
+
+<style>
+    body {
+        margin: 0;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #1e3c72 0%, #2a5298 25%, #7e22ce 75%, #06b6d4 100%);
+        background-attachment: fixed;
+        color: white;
+        min-height: 100vh;
+    }
+
+    .container {
+        width: 90%;
+        max-width: 1000px;
+        margin: auto;
+        padding: 20px;
+        backdrop-filter: blur(10px);
+    }
+
+    h1 {
+        text-align: center;
+        color: #38bdf8;
+        text-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        margin: 0;
+    }
+
+    h2, h3 {
+        color: #e0f2fe;
+        text-shadow: 0 1px 4px rgba(0,0,0,0.2);
+    }
+
+    input, button {
+        padding: 10px;
+        margin: 5px 0;
+        width: 100%;
+        border-radius: 8px;
+        border: none;
+        transition: all 0.3s ease;
+    }
+
+    input {
+        background: rgba(15, 23, 42, 0.8);
+        color: white;
+        border: 1px solid rgba(148, 163, 184, 0.2);
+    }
+
+    input:focus {
+        outline: none;
+        background: rgba(15, 23, 42, 0.95);
+        border-color: rgba(56, 189, 248, 0.5);
+        box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.1);
+    }
+
+    button {
+        background: linear-gradient(135deg, #38bdf8 0%, #0ea5e9 100%);
+        color: black;
+        font-weight: bold;
+        cursor: pointer;
+        border: none;
+    }
+
+    button:hover {
+        background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(56, 189, 248, 0.4);
+    }
+
+    button:active {
+        transform: translateY(0);
+    }
+
+    .card {
+        background: rgba(30, 41, 59, 0.85);
+        backdrop-filter: blur(8px);
+        padding: 20px;
+        border-radius: 12px;
+        margin-top: 20px;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .hidden {
+        display: none;
+    }
+
+    .header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+    }
+
+    .user-info {
+        font-size: 14px;
+        color: #cbd5e1;
+    }
+
+    .logout-btn {
+        width: auto;
+        padding: 8px 16px;
+        background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+    }
+
+    .logout-btn:hover {
+        background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+    }
+
+    .form-group {
+        margin-bottom: 15px;
+    }
+
+    .form-group label {
+        display: block;
+        margin-bottom: 5px;
+        font-weight: bold;
+        color: #e0f2fe;
+        font-size: 14px;
+    }
+
+    small {
+        color: #94a3b8;
+    }
+
+    .checkbox-group {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .checkbox-group input[type="checkbox"] {
+        width: auto;
+    }
+
+    .tabs {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 20px;
+    }
+
+    .tab-btn {
+        padding: 10px 20px;
+        width: auto;
+        background: rgba(51, 65, 85, 0.8);
+        border: 1px solid rgba(148, 163, 184, 0.2);
+        border-radius: 6px;
+        cursor: pointer;
+        font-weight: bold;
+        color: #cbd5e1;
+        transition: all 0.3s ease;
+    }
+
+    .tab-btn:hover {
+        background: rgba(71, 85, 105, 0.9);
+        border-color: rgba(56, 189, 248, 0.4);
+    }
+
+    .tab-btn.active {
+        background: linear-gradient(135deg, #38bdf8 0%, #0ea5e9 100%);
+        color: black;
+        border-color: #38bdf8;
+    }
+
+    .tab-content {
+        display: none;
+    }
+
+    .tab-content.active {
+        display: block;
+    }
+
+    .invoice-header {
+        background: rgba(15, 23, 42, 0.8);
+        padding: 15px;
+        border-radius: 6px;
+        margin-bottom: 15px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border: 1px solid rgba(56, 189, 248, 0.2);
+    }
+
+    .invoice-id {
+        font-size: 14px;
+        color: #94a3b8;
+    }
+
+    table {
+        width: 100%;
+        margin-top: 20px;
+        border-collapse: collapse;
+        background: rgba(15, 23, 42, 0.5);
+        border-radius: 8px;
+        overflow: hidden;
+    }
+
+    th, td {
+        border: 1px solid rgba(148, 163, 184, 0.2);
+        padding: 10px;
+        text-align: center;
+    }
+
+    th {
+        background: rgba(56, 189, 248, 0.2);
+        font-weight: 600;
+        color: #e0f2fe;
+    }
+
+    tr:hover {
+        background: rgba(56, 189, 248, 0.1);
+    }
+
+    .total {
+        text-align: right;
+        font-size: 18px;
+        margin-top: 10px;
+    }
+</style>
+</head>
+<body>
+
+<div class="container">
+
+    <!-- SIGN IN -->
+    <div id="loginSection" class="card">
+        <h1>Invoice Generator Pro</h1>
+        <h2>Log In</h2>
+        
+        <div class="form-group">
+            <label for="username">Username:</label>
+            <input type="text" id="username" placeholder="Username">
+        </div>
+        
+        <div class="form-group">
+            <label for="password">Password:</label>
+            <input type="password" id="password" placeholder="Password">
+        </div>
+        
+        <div class="form-group checkbox-group">
+            <input type="checkbox" id="rememberMe">
+            <label for="rememberMe" style="margin-bottom: 0;">Remember me</label>
+        </div>
+        
+        <button onclick="login()">Log In</button>
+        <p id="loginError" style="color:#ef4444; margin-top:10px;"></p>
+    </div>
+
+
+
+    <!-- DASHBOARD -->
+    <div id="dashboard" class="hidden">
+        <div class="header">
+            <h1>Invoice Generator Pro</h1>
+            <div style="display:flex; align-items:center; gap:20px;">
+                <span class="user-info">Welcome, <strong id="loggedInUser"></strong></span>
+                <button class="logout-btn" onclick="logout()">Logout</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>Create Invoice</h2>
+            
+            <div class="invoice-header">
+                <div>
+                    <p style="margin: 0; font-size:12px; color:#94a3b8;">Invoice ID:</p>
+                    <p style="margin: 5px 0 0 0; font-size:16px; font-weight:bold; color:#38bdf8;" id="invoiceId">INV-0000</p>
+                </div>
+                <button onclick="generateNewInvoiceId()" style="width: auto; padding: 8px 12px;">Generate New ID</button>
+            </div>
+
+            <div class="form-group">
+                <label for="clientName">Client Name:</label>
+                <input type="text" id="clientName" placeholder="Client Name">
+            </div>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px;">
+                <div class="form-group">
+                    <label for="itemName">Item:</label>
+                    <input type="text" id="itemName" placeholder="Description">
+                </div>
+                <div class="form-group">
+                    <label for="itemQty">Qty:</label>
+                    <input type="number" id="itemQty" placeholder="Quantity">
+                </div>
+                <div class="form-group">
+                    <label for="itemPrice">Price:</label>
+                    <input type="number" id="itemPrice" placeholder="Price">
+                </div>
+            </div>
+
+            <button onclick="addItem()">Add Item</button>
+        </div>
+
+        <div class="card">
+            <h2>Invoice Preview</h2>
+            
+            <div style="margin-bottom:15px; padding-bottom:15px; border-bottom: 1px solid #334155;">
+                <p style="margin: 0; font-size:12px; color:#94a3b8;">Invoice ID: <strong id="displayInvoiceId" style="color:#38bdf8;">INV-0000</strong></p>
+                <p style="margin: 5px 0 0 0; font-size:12px; color:#94a3b8;" id="invoiceDate"></p>
+            </div>
+
+            <table id="invoiceTable">
+                <thead>
+                    <tr>
+                        <th>Item</th>
+                        <th>Qty</th>
+                        <th>Price</th>
+                        <th>Total</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+
+            <div class="total">
+                Grand Total: ₹ <span id="grandTotal">0</span>
+            </div>
+
+            <button onclick="window.print()">Print Invoice</button>
+            <button onclick="clearInvoice()" style="background: #6366f1; margin-top: 10px;">Clear Invoice</button>
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+    let totalAmount = 0;
+    let currentInvoiceId = "INV-0001";
+    
+    // Default users only
+    let users = {
+        "admin": "password123",
+        "user": "user123",
+        "demo": "demo123"
+    };
+
+    // Initialize app on load
+    document.addEventListener("DOMContentLoaded", function() {
+        initializeAuth();
+        generateNewInvoiceId();
+        updateInvoiceDate();
+        setupFormNavigation();
+    });
+
+    // Setup keyboard navigation - press Enter to move to next field
+    function setupFormNavigation() {
+        // Login form navigation
+        const username = document.getElementById("username");
+        const password = document.getElementById("password");
+        
+        username.addEventListener("keypress", function(event) {
+            if (event.key === "Enter") {
+                event.preventDefault();
+                password.focus();
+            }
+        });
+
+        password.addEventListener("keypress", function(event) {
+            if (event.key === "Enter") {
+                event.preventDefault();
+                login();
+            }
+        });
+
+        // Invoice form navigation
+        const clientName = document.getElementById("clientName");
+        const itemName = document.getElementById("itemName");
+        const itemQty = document.getElementById("itemQty");
+        const itemPrice = document.getElementById("itemPrice");
+
+        clientName.addEventListener("keypress", function(event) {
+            if (event.key === "Enter") {
+                event.preventDefault();
+                itemName.focus();
+            }
+        });
+
+        itemName.addEventListener("keypress", function(event) {
+            if (event.key === "Enter") {
+                event.preventDefault();
+                itemQty.focus();
+            }
+        });
+
+        itemQty.addEventListener("keypress", function(event) {
+            if (event.key === "Enter") {
+                event.preventDefault();
+                itemPrice.focus();
+            }
+        });
+
+        itemPrice.addEventListener("keypress", function(event) {
+            if (event.key === "Enter") {
+                event.preventDefault();
+                addItem();
+            }
+        });
+    }
+
+    // Check if user is already logged in
+    function initializeAuth() {
+        const sessionToken = sessionStorage.getItem("authToken");
+        const rememberToken = localStorage.getItem("rememberToken");
+        const loggedInUser = sessionStorage.getItem("currentUser");
+
+        if (sessionToken && loggedInUser) {
+            // User has active session
+            showDashboard(loggedInUser);
+        } else if (rememberToken) {
+            // User had "Remember me" checked
+            const user = localStorage.getItem("rememberUser");
+            if (user && users[user]) {
+                document.getElementById("username").value = user;
+                showDashboard(user);
+            }
+        }
+
+        // Prevent direct access to dashboard without login
+        const dashboard = document.getElementById("dashboard");
+        dashboard.addEventListener("click", function(e) {
+            if (!sessionStorage.getItem("authToken")) {
+                alert("Please login first!");
+                logout();
+            }
+        });
+    }
+
+    // Login function with validation
+    function login() {
+        const username = document.getElementById("username").value.trim();
+        const password = document.getElementById("password").value;
+        const rememberMe = document.getElementById("rememberMe").checked;
+        const errorEl = document.getElementById("loginError");
+
+        // Validation
+        if (!username || !password) {
+            errorEl.innerText = "⚠️ Please enter username and password";
+            return;
+        }
+
+        if (password.length < 6) {
+            errorEl.innerText = "⚠️ Password must be at least 6 characters";
+            return;
+        }
+
+        // Check credentials
+        if (users[username] && users[username] === password) {
+            // Create session token
+            const token = generateToken();
+            sessionStorage.setItem("authToken", token);
+            sessionStorage.setItem("currentUser", username);
+            sessionStorage.setItem("loginTime", new Date().toISOString());
+
+            // Handle "Remember me"
+            if (rememberMe) {
+                localStorage.setItem("rememberToken", token);
+                localStorage.setItem("rememberUser", username);
+            }
+
+            errorEl.innerText = "";
+            showDashboard(username);
+        } else {
+            errorEl.innerText = "❌ Invalid username or password";
+            console.warn(`Failed login attempt for user: ${username}`);
+        }
+    }
+
+    // Show dashboard after successful login
+    function showDashboard(username) {
+        document.getElementById("loginSection").classList.add("hidden");
+        document.getElementById("dashboard").classList.remove("hidden");
+        document.getElementById("loggedInUser").innerText = username;
+    }
+
+    // Logout function
+    function logout() {
+        // Clear session data
+        sessionStorage.removeItem("authToken");
+        sessionStorage.removeItem("currentUser");
+        sessionStorage.removeItem("loginTime");
+
+        // Clear remember me if needed
+        const clearRemember = confirm("Clear 'Remember me' on this device?");
+        if (clearRemember) {
+            localStorage.removeItem("rememberToken");
+            localStorage.removeItem("rememberUser");
+        }
+
+        // Clear form
+        document.getElementById("username").value = "";
+        document.getElementById("password").value = "";
+        document.getElementById("rememberMe").checked = false;
+        document.getElementById("loginError").innerText = "";
+
+        // Reset invoice data
+        totalAmount = 0;
+        document.getElementById("invoiceTable").getElementsByTagName("tbody")[0].innerHTML = "";
+        document.getElementById("grandTotal").innerText = "0";
+        document.getElementById("clientName").value = "";
+        document.getElementById("itemName").value = "";
+        document.getElementById("itemQty").value = "";
+        document.getElementById("itemPrice").value = "";
+
+        // Show login screen
+        document.getElementById("dashboard").classList.add("hidden");
+        document.getElementById("loginSection").classList.remove("hidden");
+    }
+
+    // Generate a simple auth token
+    function generateToken() {
+        return "token_" + Math.random().toString(36).substr(2, 9) + "_" + Date.now();
+    }
+
+
+
+
+
+
+
+    // Generate new invoice ID with special symbols and unique components
+    function generateNewInvoiceId() {
+        const lastId = localStorage.getItem("lastInvoiceId") || "0000";
+        const nextNum = String(parseInt(lastId) + 1).padStart(4, "0");
+        localStorage.setItem("lastInvoiceId", nextNum);
+        
+        // Generate unique components
+        const timestamp = Date.now().toString().slice(-6); // Last 6 digits of timestamp
+        const randomDigits = Math.floor(Math.random() * 10000).toString().padStart(4, "0");
+        const specialChars = ["@", "#", "$", "%", "₹", "&", "*", "!"][Math.floor(Math.random() * 7)];
+        const randomLetters = String.fromCharCode(65 + Math.floor(Math.random() * 26)) + 
+                             String.fromCharCode(65 + Math.floor(Math.random() * 26));
+        
+        // Create unique invoice ID: INV-#2024-1234$XY9Z@5678
+        currentInvoiceId = `INV-${specialChars}${nextNum}${randomLetters}${randomDigits}${specialChars}`;
+        
+        document.getElementById("invoiceId").innerText = currentInvoiceId;
+        document.getElementById("displayInvoiceId").innerText = currentInvoiceId;
+    }
+
+    // Update invoice date
+    function updateInvoiceDate() {
+        const today = new Date();
+        const dateStr = today.toLocaleDateString("en-US", { 
+            year: "numeric", 
+            month: "short", 
+            day: "numeric" 
+        });
+        document.getElementById("invoiceDate").innerText = "Date: " + dateStr;
+    }
+
+    // Clear invoice and generate new ID
+    function clearInvoice() {
+        totalAmount = 0;
+        document.getElementById("invoiceTable").getElementsByTagName("tbody")[0].innerHTML = "";
+        document.getElementById("grandTotal").innerText = "0";
+        document.getElementById("clientName").value = "";
+        document.getElementById("itemName").value = "";
+        document.getElementById("itemQty").value = "";
+        document.getElementById("itemPrice").value = "";
+        generateNewInvoiceId();
+        updateInvoiceDate();
+    }
+
+    // Verify authentication before adding items
+    function addItem() {
+        if (!sessionStorage.getItem("authToken")) {
+            alert("Session expired. Please login again.");
+            logout();
+            return;
+        }
+
+        const item = document.getElementById("itemName").value;
+        const qty = parseFloat(document.getElementById("itemQty").value);
+        const price = parseFloat(document.getElementById("itemPrice").value);
+
+        if (!item || !qty || !price) {
+            alert("Please fill all fields");
+            return;
+        }
+
+        const itemTotal = qty * price;
+        totalAmount += itemTotal;
+
+        const table = document.getElementById("invoiceTable").getElementsByTagName("tbody")[0];
+        const row = table.insertRow();
+
+        row.insertCell(0).innerText = item;
+        row.insertCell(1).innerText = qty;
+        row.insertCell(2).innerText = price;
+        row.insertCell(3).innerText = itemTotal;
+
+        document.getElementById("grandTotal").innerText = totalAmount.toFixed(2);
+
+        document.getElementById("itemName").value = "";
+        document.getElementById("itemQty").value = "";
+        document.getElementById("itemPrice").value = "";
+    }
+</script>
+
+</body>
+</html>
